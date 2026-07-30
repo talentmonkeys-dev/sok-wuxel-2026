@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SOK Wuxel 2026 🍌</title>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#F2C94C" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="SOK Wuxel" />
+  <link rel="apple-touch-icon" href="/icon-192.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --black: #0a0a0a; --dark: #141414; --card: #1c1c1c; --border: #2a2a2a;
+      --yellow: #F2C94C; --yellow-dim: rgba(242,201,76,0.12); --green: #3C7A3C;
+      --green-dim: rgba(60,122,60,0.15); --white: #f0f0f0; --muted: #666; --danger: #e05252;
+    }
+    body { background: var(--black); color: var(--white); font-family: 'Inter', sans-serif; min-height: 100vh; }
+    h1, h2, h3, .bebas { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.04em; }
+    .header { background: var(--dark); border-bottom: 2px solid var(--yellow); padding: 0 24px; display: flex; align-items: center; justify-content: space-between; height: 60px; position: sticky; top: 0; z-index: 100; }
+    .header-logo { display: flex; align-items: center; gap: 10px; }
+    .header-logo h1 { font-size: 1.6rem; color: var(--yellow); line-height: 1; }
+    .header-logo span { font-size: 0.7rem; color: var(--muted); font-family: 'Inter', sans-serif; letter-spacing: 0.1em; text-transform: uppercase; }
+    .header-right { display: flex; align-items: center; gap: 8px; }
+    .header-ape { font-size: 0.85rem; color: var(--muted); }
+    .header-ape strong { color: var(--yellow); }
+    .container { max-width: 960px; margin: 0 auto; padding: 24px 16px; }
+    .login-wrap { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 24px; padding: 24px; }
+    .login-title { font-size: 4rem; color: var(--yellow); text-align: center; line-height: 1; font-family: 'Bebas Neue', sans-serif; }
+    .login-sub { color: var(--muted); font-size: 0.9rem; text-align: center; }
+    .login-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 32px; width: 100%; max-width: 380px; display: flex; flex-direction: column; gap: 16px; }
+    .login-card label { font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+    .login-card select, .login-card input { width: 100%; background: var(--dark); border: 1px solid var(--border); border-radius: 8px; color: var(--white); padding: 12px 14px; font-size: 0.95rem; font-family: 'Inter', sans-serif; margin-top: 6px; }
+    .login-card select:focus, .login-card input:focus { outline: none; border-color: var(--yellow); }
+    .pin-dots { display: flex; justify-content: center; gap: 12px; margin: 8px 0; }
+    .pin-dot { width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--border); background: transparent; transition: all 0.15s; }
+    .pin-dot.filled { background: var(--yellow); border-color: var(--yellow); }
+    .pin-input { text-align: center; letter-spacing: 0.3em; font-size: 1.2rem; }
+    .btn { padding: 12px 20px; border-radius: 8px; border: none; font-family: 'Inter', sans-serif; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: opacity 0.15s, transform 0.1s; }
+    .btn:active { transform: scale(0.97); }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-yellow { background: var(--yellow); color: #000; width: 100%; }
+    .btn-yellow:hover:not(:disabled) { opacity: 0.88; }
+    .btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--white); }
+    .btn-ghost:hover { border-color: var(--yellow); color: var(--yellow); }
+    .tabs { display: flex; gap: 4px; background: var(--dark); border-radius: 10px; padding: 4px; margin-bottom: 24px; }
+    .tab { flex: 1; padding: 10px; text-align: center; border-radius: 7px; cursor: pointer; font-size: 0.85rem; font-weight: 600; color: var(--muted); border: none; background: none; transition: all 0.15s; }
+    .tab.active { background: var(--yellow); color: #000; }
+    .tab:hover:not(.active) { color: var(--white); }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 16px; }
+    .card-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 16px; color: var(--yellow); }
+    .lb-row { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+    .lb-row:last-child { border-bottom: none; }
+    .lb-rank { font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem; color: var(--muted); width: 32px; text-align: center; }
+    .lb-rank.gold { color: var(--yellow); }
+    .lb-rank.silver { color: #aaa; }
+    .lb-rank.bronze { color: #cd7f32; }
+    .lb-name { flex: 1; font-weight: 600; font-size: 0.95rem; }
+    .lb-badge { font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; margin-left: 6px; }
+    .lb-you { color: var(--yellow); background: var(--yellow-dim); }
+    .lb-pays { color: #5cb85c; background: var(--green-dim); }
+    .lb-stats { text-align: right; }
+    .lb-amount { font-family: 'Bebas Neue', sans-serif; font-size: 1.5rem; color: var(--yellow); line-height: 1; }
+    .lb-km { font-size: 0.75rem; color: var(--muted); }
+    .progress-wrap { margin-bottom: 24px; }
+    .progress-label { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--muted); margin-bottom: 6px; }
+    .progress-bar { height: 8px; background: var(--dark); border-radius: 4px; overflow: hidden; }
+    .progress-fill { height: 100%; background: var(--yellow); border-radius: 4px; transition: width 0.5s ease; }
+    .progress-fill.green { background: var(--green); }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group.full { grid-column: 1 / -1; }
+    .form-group label { font-size: 0.78rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.07em; }
+    .form-group select, .form-group input { background: var(--dark); border: 1px solid var(--border); border-radius: 8px; color: var(--white); padding: 11px 13px; font-size: 0.9rem; font-family: 'Inter', sans-serif; }
+    .form-group select:focus, .form-group input:focus { outline: none; border-color: var(--yellow); }
+    .calc-preview { background: var(--yellow-dim); border: 1px solid var(--yellow); border-radius: 8px; padding: 14px; text-align: center; font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; color: var(--yellow); }
+    .calc-preview small { display: block; font-family: 'Inter', sans-serif; font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
+    .upload-zone { border: 2px dashed var(--border); border-radius: 8px; padding: 20px; text-align: center; cursor: pointer; transition: border-color 0.15s; color: var(--muted); font-size: 0.88rem; }
+    .upload-zone:hover { border-color: var(--yellow); color: var(--yellow); }
+    .upload-zone.has-file { border-color: var(--green); color: #5cb85c; }
+    .upload-preview { width: 100%; max-height: 120px; object-fit: cover; border-radius: 6px; margin-top: 8px; }
+    .act-item { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 0.88rem; }
+    .act-item:last-child { border-bottom: none; }
+    .act-icon { font-size: 1.3rem; width: 32px; text-align: center; }
+    .act-info { flex: 1; }
+    .act-info .act-type { font-weight: 600; }
+    .act-info .act-meta { color: var(--muted); font-size: 0.78rem; }
+    .act-proof { width: 44px; height: 44px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border); cursor: pointer; }
+    .act-amount { font-family: 'Bebas Neue', sans-serif; font-size: 1.2rem; color: var(--yellow); }
+    .act-delete { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 1rem; padding: 4px; }
+    .act-delete:hover { color: var(--danger); }
+    .goal-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 24px; }
+    .goal-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 16px; text-align: center; }
+    .goal-card .goal-val { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; color: var(--yellow); line-height: 1; }
+    .goal-card .goal-label { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.07em; margin-top: 4px; }
+    .goal-card.achieved { border-color: var(--green); }
+    .goal-card.achieved .goal-val { color: #5cb85c; }
+    .tarif-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+    .tarif-table th { text-align: left; color: var(--muted); font-weight: 600; font-size: 0.75rem; text-transform: uppercase; padding: 6px 10px; border-bottom: 1px solid var(--border); }
+    .tarif-table td { padding: 10px 10px; border-bottom: 1px solid var(--border); }
+    .tarif-table tr:last-child td { border-bottom: none; }
+    .tarif-badge { background: var(--yellow-dim); color: var(--yellow); border-radius: 4px; padding: 2px 8px; font-size: 0.8rem; font-weight: 600; }
+    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--green); color: #fff; padding: 12px 24px; border-radius: 8px; font-weight: 600; font-size: 0.9rem; z-index: 999; animation: fadeInUp 0.3s ease; }
+    .toast.error { background: var(--danger); }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateX(-50%) translateY(10px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+    .loading { display: flex; justify-content: center; align-items: center; padding: 48px; color: var(--muted); gap: 10px; }
+    .spinner { width: 20px; height: 20px; border: 2px solid var(--border); border-top-color: var(--yellow); border-radius: 50%; animation: spin 0.7s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .empty { text-align: center; color: var(--muted); padding: 32px; font-size: 0.9rem; }
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 200; display: flex; align-items: center; justify-content: center; padding: 16px; }
+    .modal-img { max-width: 100%; max-height: 90vh; border-radius: 10px; }
+    @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } .goal-grid { grid-template-columns: 1fr 1fr; } .header-logo h1 { font-size: 1.3rem; } }
+  </style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { createClient } = supabase;
+const { useState, useEffect, useCallback, useRef } = React;
+
+const SUPABASE_URL = 'https://owikmfcyfrqkukbhzkmt.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_Lqrcegjvjf9Bv8r6DgKGXA__Fa2ymJi';
+const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// Apes mit PIN und Auslosung (wer zahlt für wen)
+const APES_DATA = [
+  { name: 'Jura Ape',     pin: '0000', paysFor: 'Finanz Ape'   },
+  { name: 'Schnurri Ape', pin: '1111', paysFor: 'Wusel Ape'    },
+  { name: 'Spritzen Ape', pin: '2222', paysFor: 'Meister Ape'  },
+  { name: 'Wusel Ape',    pin: '3333', paysFor: 'Werner Ape'   },
+  { name: 'Meister Ape',  pin: '4444', paysFor: 'Schnurri Ape' },
+  { name: 'Finanz Ape',   pin: '5555', paysFor: 'Potter Ape'   },
+  { name: 'Potter Ape',   pin: '6666', paysFor: 'Maffler Ape'  },
+  { name: 'Maffler Ape',  pin: '7777', paysFor: 'Spritzen Ape' },
+  { name: 'Werner Ape',   pin: '8888', paysFor: 'Äxel Ape'     },
+  { name: 'Harti Ape',    pin: '9999', paysFor: 'Jura Ape'     },
+  { name: 'Äxel Ape',     pin: '0001', paysFor: 'Harti Ape'    },
+];
+
+const APES = APES_DATA.map(a => a.name);
+
+const SPORTS = [
+  { key: 'laufen',    label: 'Laufen / Joggen',                       icon: '🏃', unit: 'km',      rate: 0.25 },
+  { key: 'radfahren', label: 'Radfahren',                              icon: '🚴', unit: 'km',      rate: 0.10 },
+  { key: 'schwimmen', label: 'Schwimmen',                              icon: '🏊', unit: 'km',      rate: 0.80 },
+  { key: 'wandern',   label: 'Wandern / Schnelles Gehen',              icon: '🥾', unit: 'km',      rate: 0.60 },
+  { key: 'fitness',   label: 'Fitnessstudio (mind. 30 Min.)',          icon: '🏋️', unit: 'Einheit', rate: 2.00, flat: true },
+  { key: 'teamsport', label: 'Teamsport (Padel, Tennis, Fußball...)', icon: '🎾', unit: 'Einheit', rate: 2.00, flat: true },
+];
+
+const GOAL_KM    = 1000;
+const GOAL_EUR   = 750;
+const STRETCH    = 1000;
+const CAP_SPENDE = 120;
+
+function calcAmount(sport, value) {
+  if (!sport || !value || isNaN(value)) return 0;
+  const s = SPORTS.find(x => x.key === sport);
+  if (!s) return 0;
+  return parseFloat((s.rate * parseFloat(value)).toFixed(2));
+}
+function getSportMeta(key) { return SPORTS.find(s => s.key === key) || {}; }
+function getApeData(name) { return APES_DATA.find(a => a.name === name) || {}; }
+
+function Toast({ msg, type, onDone }) {
+  useEffect(() => { const t = setTimeout(onDone, 2800); return () => clearTimeout(t); }, []);
+  return <div className={`toast${type === 'error' ? ' error' : ''}`}>{msg}</div>;
+}
+
+function ImageModal({ url, onClose }) {
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <img className="modal-img" src={url} alt="Beweis" />
+    </div>
+  );
+}
+
+// ── LOGIN ────────────────────────────────────────────────────────────────────
+function Login({ onLogin }) {
+  const [ape, setApe]     = useState('');
+  const [pin, setPin]     = useState('');
+  const [error, setError] = useState('');
+
+  function handlePin(e) {
+    const v = e.target.value.replace(/\D/g, '').slice(0, 4);
+    setPin(v);
+    setError('');
+  }
+
+  function handleLogin() {
+    const apeData = APES_DATA.find(a => a.name === ape);
+    if (!apeData) return;
+    if (pin !== apeData.pin) { setError('Falscher PIN! 🙈'); setPin(''); return; }
+    onLogin(ape);
+  }
+
+  return (
+    <div className="login-wrap">
+      <div style={{textAlign:'center'}}>
+        <div style={{fontSize:'3rem',marginBottom:'8px'}}>🍌🦍🍌</div>
+        <div className="login-title">SOK WUXEL<br/>2026</div>
+        <div className="login-sub" style={{marginTop:'8px'}}>Apes Together Strong — August für den guten Zweck</div>
+      </div>
+      <div className="login-card">
+        <div>
+          <label>Wer bist du, Ape?</label>
+          <select value={ape} onChange={e => { setApe(e.target.value); setPin(''); setError(''); }} style={{marginTop:'8px'}}>
+            <option value="">— Ape auswählen —</option>
+            {APES.map(a => <option key={a} value={a}>{a}</option>)}
+          </select>
+        </div>
+        {ape && (
+          <div>
+            <label>PIN</label>
+            <div className="pin-dots">
+              {[0,1,2,3].map(i => <div key={i} className={`pin-dot${pin.length > i ? ' filled' : ''}`}/>)}
+            </div>
+            <input className="pin-input" type="password" inputMode="numeric" pattern="[0-9]*"
+              maxLength={4} value={pin} onChange={handlePin} placeholder="••••"
+              onKeyDown={e => e.key === 'Enter' && pin.length === 4 && handleLogin()} />
+            {error && <div style={{color:'var(--danger)', fontSize:'0.82rem', marginTop:'6px', textAlign:'center'}}>{error}</div>}
+          </div>
+        )}
+        <button className="btn btn-yellow" disabled={!ape || pin.length !== 4} onClick={handleLogin}>
+          Einloggen 🍌
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ── APE DETAIL MODAL ─────────────────────────────────────────────────────────
+function ApeDetailModal({ apeName, onClose, onImgClick }) {
+  const [acts, setActs] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function load() {
+      const { data } = await sb.from('activities')
+        .select('*').eq('ape_name', apeName).order('date', { ascending: false });
+      setActs(data || []);
+      setLoading(false);
+    }
+    load();
+  }, [apeName]);
+
+  const total = acts.reduce((s,a) => s + a.amount, 0);
+  const capped = Math.min(total, CAP_SPENDE);
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div style={{background:'var(--card)', border:'1px solid var(--border)', borderRadius:'14px', width:'100%', maxWidth:'480px', maxHeight:'80vh', overflow:'auto', padding:'20px'}}
+        onClick={e => e.stopPropagation()}>
+        <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'16px'}}>
+          <div>
+            <div style={{fontFamily:'Bebas Neue', fontSize:'1.6rem', color:'var(--yellow)'}}>{apeName}</div>
+            <div style={{fontSize:'0.78rem', color:'var(--muted)'}}>
+              {capped.toFixed(2)}€ Spendenwert · {acts.length} Aktivitäten
+            </div>
+          </div>
+          <button onClick={onClose} style={{background:'none', border:'none', color:'var(--muted)', fontSize:'1.4rem', cursor:'pointer'}}>✕</button>
+        </div>
+        {loading ? <div className="loading"><div className="spinner"/></div> :
+          acts.length === 0 ? <div className="empty">Noch keine Aktivitäten 🦍</div> :
+          acts.map(a => {
+            const meta = getSportMeta(a.sport);
+            return (
+              <div key={a.id} className="act-item">
+                <div className="act-icon">{meta.icon || '🏃'}</div>
+                <div className="act-info">
+                  <div className="act-type">{meta.label || a.sport}</div>
+                  <div className="act-meta">{a.date} · {a.value} {a.unit}</div>
+                </div>
+                {a.photo_url && (
+                  <img className="act-proof" src={a.photo_url} alt="Beweis"
+                    onClick={() => onImgClick(a.photo_url)} />
+                )}
+                <div className="act-amount">{a.amount.toFixed(2)}€</div>
+              </div>
+            );
+          })
+        }
+      </div>
+    </div>
+  );
+}
+
+// ── LEADERBOARD ──────────────────────────────────────────────────────────────
+function LeaderboardTab({ currentApe }) {
+  const [rows, setRows]       = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [totals, setTotals]   = useState({ km: 0, eur: 0 });
+  const [selectedApe, setSelectedApe] = useState(null);
+  const [modalImg, setModalImg]       = useState(null);
+  const myData = getApeData(currentApe);
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    const { data } = await sb.from('activities').select('*');
+    if (!data) { setLoading(false); return; }
+    const map = {};
+    APES.forEach(a => { map[a] = { name: a, amount: 0, km: 0, einheiten: 0 }; });
+    data.forEach(r => {
+      if (!map[r.ape_name]) return;
+      map[r.ape_name].amount += r.amount;
+      if (!SPORTS.find(s => s.key === r.sport && s.flat)) map[r.ape_name].km += r.value;
+      else map[r.ape_name].einheiten += r.value;
+    });
+    const sorted = Object.values(map).sort((a,b) => b.amount - a.amount);
+    const totalEur = sorted.reduce((s,r) => s + Math.min(r.amount, CAP_SPENDE), 0);
+    const totalKm  = sorted.reduce((s,r) => s + r.km, 0);
+    setRows(sorted);
+    setTotals({ km: totalKm, eur: totalEur });
+    setLoading(false);
+  }, []);
+
+  useEffect(() => { load(); const iv = setInterval(load, 15000); return () => clearInterval(iv); }, [load]);
+
+  if (loading) return <div className="loading"><div className="spinner"/><span>Lädt…</span></div>;
+
+  const kmPct  = Math.min((totals.km / GOAL_KM) * 100, 100);
+  const eurPct = Math.min((totals.eur / GOAL_EUR) * 100, 100);
+
+  return (
+    <div>
+      {myData.paysFor && (
+        <div className="card" style={{borderColor:'var(--green)', background:'var(--green-dim)', marginBottom:'16px'}}>
+          <div style={{display:'flex', alignItems:'center', gap:'12px'}}>
+            <span style={{fontSize:'1.8rem'}}>🎯</span>
+            <div>
+              <div style={{fontSize:'0.75rem', color:'#5cb85c', textTransform:'uppercase', letterSpacing:'0.08em', fontWeight:600}}>Deine Auslosung</div>
+              <div style={{fontSize:'1rem', fontWeight:700, marginTop:'2px'}}>
+                Du zahlst für <span style={{color:'var(--yellow)'}}>{myData.paysFor}</span>
+              </div>
+              <div style={{fontSize:'0.78rem', color:'var(--muted)', marginTop:'2px'}}>
+                Am Ende des Monats überweist du deren Spendenwert (max. {CAP_SPENDE}€)
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="goal-grid">
+        <div className={`goal-card${totals.km >= GOAL_KM ? ' achieved' : ''}`}>
+          <div className="goal-val">{Math.round(totals.km)}</div>
+          <div className="goal-label">Team-km / {GOAL_KM}</div>
+        </div>
+        <div className={`goal-card${totals.eur >= GOAL_EUR ? ' achieved' : ''}`}>
+          <div className="goal-val">{totals.eur.toFixed(0)}€</div>
+          <div className="goal-label">Spende / {GOAL_EUR}€</div>
+        </div>
+        <div className={`goal-card${totals.eur >= STRETCH ? ' achieved' : ''}`}>
+          <div className="goal-val">{totals.eur.toFixed(0)}€</div>
+          <div className="goal-label">Stretch {STRETCH}€</div>
+        </div>
+      </div>
+
+      <div className="progress-wrap">
+        <div className="progress-label"><span>Kilometer</span><span>{Math.round(totals.km)} / {GOAL_KM} km</span></div>
+        <div className="progress-bar"><div className="progress-fill" style={{width:`${kmPct}%`}}/></div>
+      </div>
+      <div className="progress-wrap">
+        <div className="progress-label"><span>Spendenbetrag</span><span>{totals.eur.toFixed(0)}€ / {GOAL_EUR}€</span></div>
+        <div className="progress-bar"><div className="progress-fill green" style={{width:`${eurPct}%`}}/></div>
+      </div>
+
+      <div className="card">
+        <div className="card-title">🏆 Rangliste <span style={{fontSize:'0.75rem', color:'var(--muted)', fontFamily:'Inter', fontWeight:400}}>— Ape antippen für Details</span></div>
+        {rows.map((r, i) => {
+          const rankClass = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
+          const capped = Math.min(r.amount, CAP_SPENDE);
+          const isMe = r.name === currentApe;
+          const iPayForThem = myData.paysFor === r.name;
+          return (
+            <div key={r.name} className="lb-row" onClick={() => setSelectedApe(r.name)}
+              style={{cursor:'pointer', ...(isMe ? {background:'var(--yellow-dim)', borderRadius:'8px', padding:'12px 8px'} : {})}}>
+              <div className={`lb-rank ${rankClass}`}>{i+1}</div>
+              <div className="lb-name">
+                {r.name}
+                {isMe && <span className="lb-badge lb-you">DU</span>}
+                {iPayForThem && <span className="lb-badge lb-pays">💸 du zahlst</span>}
+              </div>
+              <div className="lb-stats">
+                <div className="lb-amount">{capped.toFixed(2)}€</div>
+                <div className="lb-km">{r.km.toFixed(1)} km · {r.einheiten} Einh. 👆</div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {selectedApe && (
+        <ApeDetailModal
+          apeName={selectedApe}
+          onClose={() => setSelectedApe(null)}
+          onImgClick={url => setModalImg(url)}
+        />
+      )}
+      {modalImg && <ImageModal url={modalImg} onClose={() => setModalImg(null)} />}
+    </div>
+  );
+}
+
+// ── AKTIVITÄTEN ──────────────────────────────────────────────────────────────
+function AktivitaetenTab({ currentApe, onToast }) {
+  const [sport, setSport]     = useState('laufen');
+  const [value, setValue]     = useState('');
+  const [date, setDate]       = useState(new Date().toISOString().slice(0,10));
+  const [saving, setSaving]   = useState(false);
+  const [acts, setActs]       = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [photoFile, setPhotoFile] = useState(null);
+  const [photoPreview, setPhotoPreview] = useState(null);
+  const [modalImg, setModalImg] = useState(null);
+  const fileRef = useRef();
+
+  const s = SPORTS.find(x => x.key === sport);
+  const preview = calcAmount(sport, value);
+
+  const load = useCallback(async () => {
+    const { data } = await sb.from('activities')
+      .select('*').eq('ape_name', currentApe).order('date', { ascending: false });
+    setActs(data || []);
+    setLoading(false);
+  }, [currentApe]);
+
+  useEffect(() => { load(); }, [load]);
+
+  function handlePhoto(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    setPhotoFile(file);
+    const reader = new FileReader();
+    reader.onload = ev => setPhotoPreview(ev.target.result);
+    reader.readAsDataURL(file);
+  }
+
+  async function handleSave() {
+    if (!value || isNaN(value) || parseFloat(value) <= 0) { onToast('Wert eingeben!', 'error'); return; }
+    setSaving(true);
+    let photoUrl = null;
+    if (photoFile) {
+      const ext = photoFile.name.split('.').pop();
+      const path = `proofs/${Date.now()}_${currentApe.replace(' ','_')}.${ext}`;
+      const { error: upErr } = await sb.storage.from('proofs').upload(path, photoFile, { upsert: true });
+      if (!upErr) {
+        const { data: urlData } = sb.storage.from('proofs').getPublicUrl(path);
+        photoUrl = urlData?.publicUrl || null;
+      }
+    }
+    const { error } = await sb.from('activities').insert({
+      ape_name: currentApe, sport, value: parseFloat(value),
+      amount: preview, date, unit: s.unit, photo_url: photoUrl
+    });
+    if (error) { onToast('Fehler beim Speichern 😬', 'error'); }
+    else { onToast('Aktivität gespeichert! 🍌'); setValue(''); setPhotoFile(null); setPhotoPreview(null); load(); }
+    setSaving(false);
+  }
+
+  async function handleDelete(id) {
+    await sb.from('activities').delete().eq('id', id);
+    onToast('Gelöscht.'); load();
+  }
+
+  const totalAmount = acts.reduce((s,a) => s + a.amount, 0);
+  const capped = Math.min(totalAmount, CAP_SPENDE);
+
+  return (
+    <div>
+      <div className="card">
+        <div className="card-title">📊 Deine Stats — {currentApe}</div>
+        <div style={{display:'flex', gap:'16px', flexWrap:'wrap'}}>
+          <div style={{flex:1, minWidth:'120px'}}>
+            <div style={{fontFamily:'Bebas Neue', fontSize:'2rem', color:'var(--yellow)', lineHeight:1}}>{totalAmount.toFixed(2)}€</div>
+            <div style={{fontSize:'0.75rem', color:'var(--muted)'}}>Ersportelt</div>
+          </div>
+          <div style={{flex:1, minWidth:'120px'}}>
+            <div style={{fontFamily:'Bebas Neue', fontSize:'2rem', color:'#5cb85c', lineHeight:1}}>{capped.toFixed(2)}€</div>
+            <div style={{fontSize:'0.75rem', color:'var(--muted)'}}>Spendenwert (Cap {CAP_SPENDE}€)</div>
+          </div>
+          <div style={{flex:1, minWidth:'120px'}}>
+            <div style={{fontFamily:'Bebas Neue', fontSize:'2rem', color:'var(--muted)', lineHeight:1}}>{acts.length}</div>
+            <div style={{fontSize:'0.75rem', color:'var(--muted)'}}>Aktivitäten</div>
+          </div>
+        </div>
+        <div className="progress-wrap" style={{marginTop:'16px', marginBottom:0}}>
+          <div className="progress-label"><span>Zum Cap</span><span>{capped.toFixed(2)} / {CAP_SPENDE}€</span></div>
+          <div className="progress-bar"><div className="progress-fill" style={{width:`${Math.min((capped/CAP_SPENDE)*100,100)}%`}}/></div>
+        </div>
+      </div>
+
+      <div className="card">
+        <div className="card-title">➕ Aktivität eintragen</div>
+        <div className="form-grid">
+          <div className="form-group">
+            <label>Sportart</label>
+            <select value={sport} onChange={e => { setSport(e.target.value); setValue(''); }}>
+              {SPORTS.map(s => <option key={s.key} value={s.key}>{s.icon} {s.label}</option>)}
+            </select>
+          </div>
+          <div className="form-group">
+            <label>{s?.flat ? 'Anzahl Einheiten' : 'Distanz in km'}</label>
+            <input type="number" min="0" step={s?.flat ? '1' : '0.1'}
+              placeholder={s?.flat ? 'z.B. 1' : 'z.B. 5'}
+              value={value} onChange={e => setValue(e.target.value)} />
+          </div>
+          <div className="form-group">
+            <label>Datum</label>
+            <input type="date" value={date} onChange={e => setDate(e.target.value)}
+              min="2026-08-01" max="2026-08-31" />
+          </div>
+          <div className="form-group">
+            <label>Spendenwert</label>
+            <div className="calc-preview">
+              {preview > 0 ? `${preview.toFixed(2)} €` : '—'}
+              <small>{preview > 0 ? `${s?.icon} ${value} ${s?.unit}` : 'Wert eingeben'}</small>
+            </div>
+          </div>
+          <div className="form-group full">
+            <label>Beweis-Foto (optional)</label>
+            <div className={`upload-zone${photoPreview ? ' has-file' : ''}`}
+              onClick={() => fileRef.current.click()}>
+              {photoPreview
+                ? <><div>✅ Foto bereit</div><img className="upload-preview" src={photoPreview} alt="Preview"/></>
+                : <><div style={{fontSize:'1.5rem'}}>📸</div><div style={{marginTop:'6px'}}>Foto tippen/klicken zum Hochladen</div><div style={{fontSize:'0.75rem', marginTop:'4px'}}>Screenshot, Strava, Garmin etc.</div></>
+              }
+            </div>
+            <input ref={fileRef} type="file" accept="image/*" capture="environment"
+              style={{display:'none'}} onChange={handlePhoto} />
+          </div>
+        </div>
+        <button className="btn btn-yellow" style={{marginTop:'12px'}} onClick={handleSave} disabled={saving || !value}>
+          {saving ? 'Wird gespeichert…' : 'Aktivität speichern 🍌'}
+        </button>
+      </div>
+
+      <div className="card">
+        <div className="card-title">📋 Deine Aktivitäten</div>
+        {loading ? <div className="loading"><div className="spinner"/></div> :
+          acts.length === 0 ? <div className="empty">Noch keine Aktivitäten — rödeln gehen! 🦍</div> :
+          acts.map(a => {
+            const meta = getSportMeta(a.sport);
+            return (
+              <div key={a.id} className="act-item">
+                <div className="act-icon">{meta.icon || '🏃'}</div>
+                <div className="act-info">
+                  <div className="act-type">{meta.label || a.sport}</div>
+                  <div className="act-meta">{a.date} · {a.value} {a.unit}</div>
+                </div>
+                {a.photo_url && <img className="act-proof" src={a.photo_url} alt="Beweis" onClick={() => setModalImg(a.photo_url)} />}
+                <div className="act-amount">{a.amount.toFixed(2)}€</div>
+                <button className="act-delete" onClick={() => handleDelete(a.id)} title="Löschen">✕</button>
+              </div>
+            );
+          })
+        }
+      </div>
+      {modalImg && <ImageModal url={modalImg} onClose={() => setModalImg(null)} />}
+    </div>
+  );
+}
+
+// ── TARIF ────────────────────────────────────────────────────────────────────
+function TarifTab() {
+  return (
+    <div>
+      <div className="card">
+        <div className="card-title">📋 Sühnekatalog des Wuxels</div>
+        <table className="tarif-table">
+          <thead><tr><th></th><th>Disziplin</th><th>Tarif</th><th>Beispiel</th></tr></thead>
+          <tbody>
+            {SPORTS.map(s => (
+              <tr key={s.key}>
+                <td>{s.icon}</td>
+                <td>{s.label}</td>
+                <td><span className="tarif-badge">{s.flat ? `${s.rate.toFixed(2)}€ / Einheit` : `${s.rate.toFixed(2)}€ / km`}</span></td>
+                <td style={{color:'var(--muted)', fontSize:'0.82rem'}}>
+                  {s.flat ? `1 Einheit = ${s.rate.toFixed(2)}€` : `${(2/s.rate).toFixed(1)} km = 2,00€`}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div className="card">
+        <div className="card-title">📏 Grundregeln</div>
+        {[
+          'Aktivitäten vom 1. bis 31. August zählen.',
+          'Nachweis per App-Screenshot — Foto direkt beim Eintragen hochladen.',
+          'Max. 2 Trainingseinheiten pro Tag.',
+          `Mindestspende: 25€ · Cap: ${CAP_SPENDE}€ pro Ape.`,
+          'Laufband & Ergometer zählen als Laufen/Radfahren (km eintragen).',
+          'Spaziergänge nur wenn bewusst als Sport gemacht.',
+          'E-Bike nur wenn sportlich gefahren.',
+        ].map((r,i) => (
+          <div key={i} style={{display:'flex', gap:'10px', padding:'8px 0', borderBottom:'1px solid var(--border)', fontSize:'0.88rem'}}>
+            <span style={{color:'var(--yellow)', fontFamily:'Bebas Neue', fontSize:'1.1rem', minWidth:'20px'}}>{i+1}</span>
+            <span>{r}</span>
+          </div>
+        ))}
+      </div>
+      <div className="card">
+        <div className="card-title">🎯 Ziele</div>
+        <div className="goal-grid">
+          <div className="goal-card"><div className="goal-val">1.000</div><div className="goal-label">Teamkilometer</div></div>
+          <div className="goal-card"><div className="goal-val">750€</div><div className="goal-label">Spendenziel</div></div>
+          <div className="goal-card"><div className="goal-val">1.000€</div><div className="goal-label">Stretch Goal</div></div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── APP ──────────────────────────────────────────────────────────────────────
+function App() {
+  const [ape, setApe]     = useState(() => sessionStorage.getItem('sok_ape') || '');
+  const [tab, setTab]     = useState('leaderboard');
+  const [toast, setToast] = useState(null);
+
+  function handleLogin(name) {
+    sessionStorage.setItem('sok_ape', name);
+    setApe(name);
+  }
+  function handleLogout() {
+    sessionStorage.removeItem('sok_ape');
+    setApe('');
+  }
+  function showToast(msg, type = 'ok') { setToast({ msg, type }); }
+
+  if (!ape) return <Login onLogin={handleLogin} />;
+
+  return (
+    <>
+      <div className="header">
+        <div className="header-logo">
+          <span style={{fontSize:'1.5rem'}}>🍌</span>
+          <div>
+            <h1>SOK WUXEL</h1>
+            <span>2026 · Apes Together Strong</span>
+          </div>
+        </div>
+        <div className="header-right">
+          <span className="header-ape"><strong>{ape.replace(' Ape','')}</strong></span>
+          <button className="btn btn-ghost" style={{padding:'5px 10px', fontSize:'0.75rem'}} onClick={handleLogout}>Logout</button>
+        </div>
+      </div>
+      <div className="container">
+        <div className="tabs">
+          {[['leaderboard','🏆 Rangliste'],['aktivitaeten','➕ Eintragen'],['tarif','📋 Tarife']].map(([k,l]) => (
+            <button key={k} className={`tab${tab===k?' active':''}`} onClick={() => setTab(k)}>{l}</button>
+          ))}
+        </div>
+        {tab === 'leaderboard'  && <LeaderboardTab currentApe={ape} />}
+        {tab === 'aktivitaeten' && <AktivitaetenTab currentApe={ape} onToast={showToast} />}
+        {tab === 'tarif'        && <TarifTab />}
+      </div>
+      {toast && <Toast msg={toast.msg} type={toast.type} onDone={() => setToast(null)} />}
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then(() => console.log('SW registered'))
+          .catch(e => console.log('SW error', e));
+      });
+    }
+  </script>
+</body>
+</html>
